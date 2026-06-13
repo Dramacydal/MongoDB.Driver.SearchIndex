@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -6,10 +6,25 @@
         <Nullable>enable</Nullable>
         <AssemblyName>MongoDB.Driver.SearchIndex</AssemblyName>
         <RootNamespace>MongoDB.Driver.SearchIndex</RootNamespace>
+
+        <PackageId>MongoDB.Driver.SearchIndex</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Dramacydal</Authors>
+        <Description>Typed Atlas Search index management for the MongoDB C# Driver. Wraps IMongoSearchIndexManager with a fluent index definition builder, typed field mappings, and strongly-typed index info.</Description>
+        <PackageTags>mongodb;atlas;search;index;atlas-search;vector-search</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/Dramacydal/MongoDB.Driver.SearchIndex</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
+        <None Include="..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\LICENSE" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
     </ItemGroup>
 
 </Project>
