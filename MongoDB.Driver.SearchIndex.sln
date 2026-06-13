@@ -1,0 +1,28 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver.SearchIndex", "MongoDB.Driver.SearchIndex\MongoDB.Driver.SearchIndex.csproj", "{26452F5C-DA63-4501-B1F3-DF8B62E1335C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver.SearchIndex.Tests", "MongoDB.Driver.SearchIndex.Tests\MongoDB.Driver.SearchIndex.Tests.csproj", "{D59D10DA-A3A8-4CAE-9808-DBF55F9BEA3B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26452F5C-DA63-4501-B1F3-DF8B62E1335C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26452F5C-DA63-4501-B1F3-DF8B62E1335C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26452F5C-DA63-4501-B1F3-DF8B62E1335C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26452F5C-DA63-4501-B1F3-DF8B62E1335C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D59D10DA-A3A8-4CAE-9808-DBF55F9BEA3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D59D10DA-A3A8-4CAE-9808-DBF55F9BEA3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D59D10DA-A3A8-4CAE-9808-DBF55F9BEA3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D59D10DA-A3A8-4CAE-9808-DBF55F9BEA3B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
