@@ -124,6 +124,29 @@ await collection.SearchIndexes.UpdateOneAsync("search_index", definition);
 | `Similarity` | `SearchSimilarityType?` | — | `Bm25`, `Boolean`, or `StableTfl` |
 | `Multi` | `Dictionary<string, SearchFieldDefinition>?` | — | Index the same field with multiple analyzers |
 
+`Multi` allows querying the same field with different analyzers via `field.key` syntax:
+
+```csharp
+SearchIndexDefinition.Static()
+    .StringField("title", analyzer: SearchAnalyzer.English, multi: new()
+    {
+        ["keyword"] = new StringFieldDefinition { Analyzer = SearchAnalyzer.Keyword },
+        ["ru"]      = new StringFieldDefinition { Analyzer = SearchAnalyzer.Russian },
+    })
+```
+
+Generates:
+```json
+"title": {
+  "type": "string",
+  "analyzer": "lucene.english",
+  "multi": {
+    "keyword": { "type": "string", "analyzer": "lucene.keyword" },
+    "ru":      { "type": "string", "analyzer": "lucene.russian" }
+  }
+}
+```
+
 ### AutocompleteFieldDefinition
 
 | Property | Type | Default | Description |
