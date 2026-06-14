@@ -124,16 +124,29 @@ await collection.SearchIndexes.UpdateOneAsync("search_index", definition);
 | `Similarity` | `SearchSimilarityType?` | — | `Bm25`, `Boolean`, or `StableTfl` |
 | `Multi` | `Dictionary<string, SearchFieldDefinition>?` | — | Index the same field with multiple analyzers |
 
-`Multi` allows querying the same field with different analyzers via `field.key` syntax:
+`Multi` indexes the same field with multiple analyzers. To query a specific sub-analyzer, use `SearchPathDefinitionBuilder.Analyzer(field, subAnalyzerName)`:
 
 ```csharp
+// Index definition
 SearchIndexDefinition.Static()
     .StringField("title", analyzer: SearchAnalyzer.English, multi: new()
     {
         ["keyword"] = new StringFieldDefinition { Analyzer = SearchAnalyzer.Keyword },
         ["ru"]      = new StringFieldDefinition { Analyzer = SearchAnalyzer.Russian },
     })
+
+// Query using the default analyzer (English)
+collection.Aggregate().Search(
+    Builders<BsonDocument>.Search.Text("title", "running"));
+
+// Query using the keyword sub-analyzer
+var path = Builders<BsonDocument>.SearchPath.Analyzer("title", "keyword");
+collection.Aggregate().Search(
+    Builders<BsonDocument>.Search.Text(path, "Runs faster"));
 ```
+
+> **Note:** `title.keyword` dot-notation is Elasticsearch syntax and does **not** work in Atlas Search.
+> Use `SearchPath.Analyzer(field, name)` instead — it generates `{ "value": "title", "multi": "keyword" }`.
 
 Generates:
 ```json

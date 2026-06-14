@@ -453,6 +453,54 @@ public class SearchIndexIntegrationTests : IClassFixture<MongoFixture>
         Assert.Equal(SearchAnalyzer.English, body.Analyzer);
     }
 
+    // ── multi analyzer ───────────────────────────────────────────────────────
+
+    [RequiresMongo]
+    public async Task StringField_Multi_LatestDefinition_ParsedCorrectly()
+    {
+        var col = await NewCollection("multianalyzer");
+
+        await col.InsertManyAsync([
+            new BsonDocument("title", "Running fast"),
+            new BsonDocument("title", "Runs faster"),
+            new BsonDocument("title", "Walked slowly"),
+        ]);
+
+        await col.SearchIndexes.CreateOneAsync("idx",
+            SearchIndexDefinition.Static()
+                .StringField("title",
+                    analyzer: SearchAnalyzer.English,
+                    multi: new()
+                    {
+                        ["keyword"] = new StringFieldDefinition { Analyzer = SearchAnalyzer.Keyword },
+                        ["ru"]      = new StringFieldDefinition { Analyzer = SearchAnalyzer.Russian },
+                    }));
+
+        await MongoFixture.WaitForIndexReady(col, "idx");
+
+        var def = (await col.SearchIndexes.GetSearchIndexesAsync("idx"))[0].LatestDefinition;
+        Assert.NotNull(def);
+
+        var field = def.Fields["title"].OfType<StringFieldDefinition>().First();
+        Assert.Equal(SearchAnalyzer.English, field.Analyzer);
+        Assert.NotNull(field.Multi);
+        Assert.Equal(2, field.Multi.Count);
+        Assert.Equal(SearchAnalyzer.Keyword, ((StringFieldDefinition)field.Multi["keyword"]).Analyzer);
+        Assert.Equal(SearchAnalyzer.Russian, ((StringFieldDefinition)field.Multi["ru"]).Analyzer);
+
+        // English analyzer stems "running" → "run", matches both "Running fast" and "Runs faster"
+        var results = await Search(col, "idx",
+            Builders<BsonDocument>.Search.Text("title", "running"));
+        Assert.Equal(2, results.Count);
+
+        // keyword sub-analyzer via { "value": "title", "multi": "keyword" } — no stemming
+        var keywordPath = Builders<BsonDocument>.SearchPath.Analyzer("title", "keyword");
+        var keywordResults = await Search(col, "idx",
+            Builders<BsonDocument>.Search.Text(keywordPath, "Runs faster"));
+        var single = Assert.Single(keywordResults);
+        Assert.Equal("Runs faster", single["title"].AsString);
+    }
+
     // ── multiple field types on same path ─────────────────────────────────────
 
     [RequiresMongo]

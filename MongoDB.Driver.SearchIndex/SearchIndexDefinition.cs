@@ -11,8 +11,26 @@ public class SearchIndexDefinition
     public static SearchIndexDefinition Dynamic() => new() { _dynamic = true };
     public static SearchIndexDefinition Static() => new();
 
-    public SearchIndexDefinition StringField(string path, string? analyzer = null) =>
-        AddField(path, new StringFieldDefinition { Analyzer = analyzer });
+    public SearchIndexDefinition StringField(string path,
+        string? analyzer = null,
+        string? searchAnalyzer = null,
+        SearchIndexOptions? indexOptions = null,
+        bool? store = null,
+        int? ignoreAbove = null,
+        SearchSimilarityType? similarity = null,
+        SearchFieldNorms? norms = null,
+        Dictionary<string, SearchFieldDefinition>? multi = null) =>
+        AddField(path, new StringFieldDefinition
+        {
+            Analyzer       = analyzer,
+            SearchAnalyzer = searchAnalyzer,
+            IndexOptions   = indexOptions,
+            Store          = store,
+            IgnoreAbove    = ignoreAbove,
+            Similarity     = similarity,
+            Norms          = norms,
+            Multi          = multi,
+        });
 
     public SearchIndexDefinition ObjectIdField(string path) =>
         AddField(path, new ObjectIdFieldDefinition());

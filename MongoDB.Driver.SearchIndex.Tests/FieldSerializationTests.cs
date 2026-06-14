@@ -36,37 +36,45 @@ public class FieldSerializationTests
     [Fact]
     public void String_WithNorms()
     {
-        var def = SearchIndexDefinition.Static()
-            .AddStringFieldFull("f", norms: SearchFieldNorms.Omit);
-        var field = GetField(def, "f");
+        var field = GetField(SearchIndexDefinition.Static().StringField("f", norms: SearchFieldNorms.Omit), "f");
         Assert.Equal("omit", field["norms"].AsString);
     }
 
     [Fact]
     public void String_WithIndexOptions()
     {
-        var def = SearchIndexDefinition.Static()
-            .AddStringFieldFull("f", indexOptions: SearchIndexOptions.Freqs);
-        var field = GetField(def, "f");
+        var field = GetField(SearchIndexDefinition.Static().StringField("f", indexOptions: SearchIndexOptions.Freqs), "f");
         Assert.Equal("freqs", field["indexOptions"].AsString);
     }
 
     [Fact]
     public void String_WithSimilarity()
     {
-        var def = SearchIndexDefinition.Static()
-            .AddStringFieldFull("f", similarity: SearchSimilarityType.Boolean);
-        var field = GetField(def, "f");
+        var field = GetField(SearchIndexDefinition.Static().StringField("f", similarity: SearchSimilarityType.Boolean), "f");
         Assert.Equal("boolean", field["similarity"]["type"].AsString);
     }
 
     [Fact]
     public void String_WithStore()
     {
-        var def = SearchIndexDefinition.Static()
-            .AddStringFieldFull("f", store: true);
-        var field = GetField(def, "f");
+        var field = GetField(SearchIndexDefinition.Static().StringField("f", store: true), "f");
         Assert.True(field["store"].AsBoolean);
+    }
+
+    [Fact]
+    public void String_WithMulti()
+    {
+        var def = SearchIndexDefinition.Static()
+            .StringField("f", analyzer: SearchAnalyzer.English, multi: new()
+            {
+                ["keyword"] = new StringFieldDefinition { Analyzer = SearchAnalyzer.Keyword },
+                ["ru"]      = new StringFieldDefinition { Analyzer = SearchAnalyzer.Russian },
+            });
+        var field = GetField(def, "f");
+        Assert.Equal(SearchAnalyzer.English, field["analyzer"].AsString);
+        var multi = field["multi"].AsBsonDocument;
+        Assert.Equal(SearchAnalyzer.Keyword, multi["keyword"]["analyzer"].AsString);
+        Assert.Equal(SearchAnalyzer.Russian, multi["ru"]["analyzer"].AsString);
     }
 
     // ── autocomplete ─────────────────────────────────────────────────────────
@@ -380,27 +388,3 @@ public class FieldSerializationTests
     }
 }
 
-// Extension to build StringFieldDefinition with all options inline (test helper only)
-file static class TestExtensions
-{
-    public static SearchIndexDefinition AddStringFieldFull(
-        this SearchIndexDefinition def,
-        string path,
-        string? analyzer = null,
-        SearchIndexOptions? indexOptions = null,
-        SearchFieldNorms? norms = null,
-        SearchSimilarityType? similarity = null,
-        bool? store = null,
-        int? ignoreAbove = null)
-    {
-        return def.ArrayField(path, new StringFieldDefinition
-        {
-            Analyzer     = analyzer,
-            IndexOptions = indexOptions,
-            Norms        = norms,
-            Similarity   = similarity,
-            Store        = store,
-            IgnoreAbove  = ignoreAbove,
-        });
-    }
-}

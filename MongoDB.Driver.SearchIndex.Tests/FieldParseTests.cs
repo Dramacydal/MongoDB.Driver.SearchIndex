@@ -28,6 +28,24 @@ public class FieldParseTests
     }
 
     [Fact]
+    public void String_Multi_RoundTrip()
+    {
+        var original = SearchIndexDefinition.Static()
+            .StringField("f", analyzer: SearchAnalyzer.English, multi: new()
+            {
+                ["keyword"] = new StringFieldDefinition { Analyzer = SearchAnalyzer.Keyword },
+                ["ru"]      = new StringFieldDefinition { Analyzer = SearchAnalyzer.Russian },
+            });
+
+        var field = RoundTrip<StringFieldDefinition>(original, "f");
+        Assert.Equal(SearchAnalyzer.English, field.Analyzer);
+        Assert.NotNull(field.Multi);
+        Assert.Equal(2, field.Multi.Count);
+        Assert.Equal(SearchAnalyzer.Keyword, ((StringFieldDefinition)field.Multi["keyword"]).Analyzer);
+        Assert.Equal(SearchAnalyzer.Russian, ((StringFieldDefinition)field.Multi["ru"]).Analyzer);
+    }
+
+    [Fact]
     public void String_Analyzer_RoundTrip()
     {
         var field = RoundTrip<StringFieldDefinition>(
@@ -39,15 +57,13 @@ public class FieldParseTests
     public void String_AllOptions_RoundTrip()
     {
         var original = SearchIndexDefinition.Static()
-            .ArrayField("f", new StringFieldDefinition
-            {
-                Analyzer     = SearchAnalyzer.Russian,
-                IndexOptions = SearchIndexOptions.Offsets,
-                Norms        = SearchFieldNorms.Omit,
-                Similarity   = SearchSimilarityType.Bm25,
-                Store        = true,
-                IgnoreAbove  = 256,
-            });
+            .StringField("f",
+                analyzer:     SearchAnalyzer.Russian,
+                indexOptions: SearchIndexOptions.Offsets,
+                norms:        SearchFieldNorms.Omit,
+                similarity:   SearchSimilarityType.Bm25,
+                store:        true,
+                ignoreAbove:  256);
 
         var field = RoundTrip<StringFieldDefinition>(original, "f");
         Assert.Equal(SearchAnalyzer.Russian, field.Analyzer);
